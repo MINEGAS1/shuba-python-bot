@@ -1,5 +1,6 @@
 import random
 import os
+import asyncio
 from threading import Thread
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update
@@ -47,15 +48,14 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         price = random.choice(PRICES[caption])
         await update.message.reply_text(f"{price} рублей")
 
-def main():
-    # Запускаем веб-сервер в отдельном потоке
+async def main():
     Thread(target=run_web_server, daemon=True).start()
     
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-    app.run_polling()
+    await app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
