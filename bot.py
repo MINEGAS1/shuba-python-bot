@@ -1,12 +1,11 @@
 import random
 import os
-import asyncio
-from threading import Thread
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 TOKEN = "8400518828:AAGJhXYoYdbPwFH8MMzegbPaqlc-2r2653A"
+PORT = int(os.environ.get("PORT", 10000))
+RENDER_URL = os.environ.get("RENDER_EXTERNAL_URL", "")
 
 PRICES = {
     "Оцени шубу!": [3000, 4000, 5000],
@@ -25,17 +24,6 @@ HELP_TEXT = """
 Оцени пожалуйста шубу — 15-20 тыс. рублей
 """
 
-class DummyHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"OK")
-
-def run_web_server():
-    port = int(os.environ.get("PORT", 10000))
-    server = HTTPServer(("0.0.0.0", port), DummyHandler)
-    server.serve_forever()
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Для получения помощи напишите /help")
 
@@ -48,14 +36,20 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         price = random.choice(PRICES[caption])
         await update.message.reply_text(f"{price} рублей")
 
-async def main():
-    Thread(target=run_web_server, daemon=True).start()
-    
+def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-    await app.run_polling()
+    
+    if RENDER_URL:
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            webhook_url=f"{RENDER_URL}/webhook"
+        )
+    else:
+        app.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
