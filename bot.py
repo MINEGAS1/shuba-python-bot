@@ -5,7 +5,6 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 
 TOKEN = "8400518828:AAGJhXYoYdbPwFH8MMzegbPaqlc-2r2653A"
 PORT = int(os.environ.get("PORT", 10000))
-RENDER_URL = os.environ.get("RENDER_EXTERNAL_URL", "")
 
 PRICES = {
     "Оцени шубу!": [3000, 4000, 5000],
@@ -41,16 +40,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-
-    if RENDER_URL:
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            webhook_url=f"{RENDER_URL}/webhook",
-            secret_token="shubabot123"
-        )
-    else:
-        app.run_polling()
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
