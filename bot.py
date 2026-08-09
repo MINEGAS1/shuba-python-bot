@@ -1,7 +1,7 @@
 import random
 import os
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 TOKEN = "8400518828:AAGJhXYoYdbPwFH8MMzegbPaqlc-2r2653A"
 PORT = int(os.environ.get("PORT", 10000))
@@ -37,7 +37,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"{price} рублей")
 
 def main():
-    app = Application.builder().token(TOKEN).build()
+    app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
@@ -46,10 +46,11 @@ def main():
         app.run_webhook(
             listen="0.0.0.0",
             port=PORT,
-            webhook_url=f"{RENDER_URL}/webhook"
+            webhook_url=f"{RENDER_URL}/webhook",
+            secret_token="shubabot123"
         )
     else:
         app.run_polling()
 
-if __name__ == "__main__":
+if name == "__main__":
     main()
