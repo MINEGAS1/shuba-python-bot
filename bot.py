@@ -41,7 +41,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-    
+
     if RENDER_URL:
         app.run_webhook(
             listen="0.0.0.0",
@@ -52,17 +52,4 @@ def main():
         app.run_polling()
 
 if __name__ == "__main__":
-def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-
-    if RENDER_URL:
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            webhook_url=f"{RENDER_URL}/webhook"
-        )
-    else:
-        app.run_polling()
+    main()
